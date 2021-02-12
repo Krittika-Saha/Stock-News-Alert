@@ -1,19 +1,29 @@
 from requests import get
 STOCK = "TSLA"
 COMPANY_NAME = "Tesla Inc"
+from datetime import datetime, timedelta
 
 STOCK_ENDPOINT = "https://www.alphavantage.co/query"
 NEWS_ENDPOINT = "https://newsapi.org/v2/everything"
-STOCK_API_KEY = "_YOUR_API_KEY_"
+STOCK_API_KEY = "_YOUR_STOCK_API_KEY_"
+NEWS_API_KEY = "_YOUR_NEWSAPI_API_KEY_"
 
 
 ## STEP 1: Use https://newsapi.org/docs/endpoints/everything
 # When STOCK price increase/decreases by 5% between yesterday and the day before yesterday then print("Get News").
-#HINT 1: Get the closing price for yesterday and the day before yesterday. Find the positive difference between the two prices. e.g. 40 - 20 = -20, but the positive difference is 20.
+#HINT 1: Get the closing price for yesterday and the day before yesterday. Find the positive difference between the two prices. e.g. 40 - 20 = 20.
 #HINT 2: Work out the value of 5% of yerstday's closing stock price.
 
-stock_data = get(f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=TSLA&apikey={STOCK_API_KEY}")
-print(stock_data.json())
+stock_response = get(f"{STOCK_ENDPOINT}?function=TIME_SERIES_DAILY&symbol={STOCK}&apikey={STOCK_API_KEY}")
+stock_response.raise_for_status()
+stock_data = stock_response.json()
+closing_price_yesterday = stock_data['Time Series (Daily)'][f"{str(datetime.today() - timedelta(days = 1))[:10]}"]['4. close']
+closing_price_before_yesterday = stock_data['Time Series (Daily)'][f"{str(datetime.today() - timedelta(days = 2))[:10]}"]['4. close']
+difference = abs(float(closing_price_yesterday) - float(closing_price_before_yesterday))
+diff_percent = (difference/float(closing_price_yesterday)) * 100
+
+if diff_percent > 5:
+    print("Get News")
 
 ## STEP 2: Use https://newsapi.org/docs/endpoints/everything
 # Instead of printing ("Get News"), actually fetch the first 3 articles for the COMPANY_NAME. 
