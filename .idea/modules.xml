@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../Rain-Alert/.idea/Rain-Alert.iml" filepath="$PROJECT_DIR$/../Rain-Alert/.idea/Rain-Alert.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/Stock-News-Alert.iml" filepath="$PROJECT_DIR$/.idea/Stock-News-Alert.iml" />
     </modules>
   </component>

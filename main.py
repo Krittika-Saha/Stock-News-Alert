@@ -1,12 +1,16 @@
 from requests import get
 STOCK = "TSLA"
-COMPANY_NAME = "Tesla Inc"
+COMPANY_NAME = "Tesla%20Inc"
 from datetime import datetime, timedelta
+from twilio.rest import Client
 
 STOCK_ENDPOINT = "https://www.alphavantage.co/query"
 NEWS_ENDPOINT = "https://newsapi.org/v2/everything"
-STOCK_API_KEY = "_YOUR_STOCK_API_KEY_"
-NEWS_API_KEY = "_YOUR_NEWSAPI_API_KEY_"
+STOCK_API_KEY = "YOUR_KEY_HERE"
+NEWS_API_KEY = "YOUR_KEY_HERE"
+account_sid = "_YOUR_SID_HERE_"
+auth_token = 'YOUR_KEY_HERE'
+string = ""
 
 
 ## STEP 1: Use https://newsapi.org/docs/endpoints/everything
@@ -17,24 +21,32 @@ NEWS_API_KEY = "_YOUR_NEWSAPI_API_KEY_"
 stock_response = get(f"{STOCK_ENDPOINT}?function=TIME_SERIES_DAILY&symbol={STOCK}&apikey={STOCK_API_KEY}")
 stock_response.raise_for_status()
 stock_data = stock_response.json()
-closing_price_yesterday = stock_data['Time Series (Daily)'][f"{str(datetime.today() - timedelta(days = 1))[:10]}"]['4. close']
-closing_price_before_yesterday = stock_data['Time Series (Daily)'][f"{str(datetime.today() - timedelta(days = 2))[:10]}"]['4. close']
-difference = abs(float(closing_price_yesterday) - float(closing_price_before_yesterday))
-diff_percent = (difference/float(closing_price_yesterday)) * 100
-
-if diff_percent > 5:
-    print("Get News")
-
-## STEP 2: Use https://newsapi.org/docs/endpoints/everything
-# Instead of printing ("Get News"), actually fetch the first 3 articles for the COMPANY_NAME. 
-#HINT 1: Think about using the Python Slice Operator
-
+closing_price_yesterday = float(stock_data['Time Series (Daily)'][f"{str(datetime.today() - timedelta(days = 1))[:10]}"]['4. close'])
+closing_price_before_yesterday = float(stock_data['Time Series (Daily)'][f"{str(datetime.today() - timedelta(days = 2))[:10]}"]['4. close'])
+difference = closing_price_yesterday - closing_price_before_yesterday
+diff_percent = (abs(difference)/closing_price_yesterday) * 100
+if difference < 0:
+    string = f"🔻{round(diff_percent, 2)}%"
+else:
+    string = f"🔺{round(diff_percent, 2)}%"
 
 
 ## STEP 3: Use twilio.com/docs/sms/quickstart/python
 # Send a separate message with each article's title and description to your phone number. 
 #HINT 1: Consider using a List Comprehension.
-
+if diff_percent+5 > 5:
+    news_data = (get(f"{NEWS_ENDPOINT}?q={COMPANY_NAME}&apiKey={NEWS_API_KEY}").json())['articles'][:3]
+    client = Client(account_sid, auth_token)
+    for i in range(len(news_data)):
+        message = client.messages.create(
+            body=f"""
+           {STOCK}:  {string}
+Headline: {news_data[i]['title']} ({STOCK})?
+Brief: {news_data[i]['description']}""",
+            from_='whatsapp:+_YOUR_SANDBOX_PHONE_HERE_',
+            to='whatsapp:+_YOUR_PHONE_HERE_'
+        )
+        print(message.status)
 
 
 #Optional: Format the SMS message like this: 
