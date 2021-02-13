@@ -6,10 +6,10 @@ from twilio.rest import Client
 
 STOCK_ENDPOINT = "https://www.alphavantage.co/query"
 NEWS_ENDPOINT = "https://newsapi.org/v2/everything"
-STOCK_API_KEY = "YOUR_KEY_HERE"
-NEWS_API_KEY = "YOUR_KEY_HERE"
-account_sid = "_YOUR_SID_HERE_"
-auth_token = 'YOUR_KEY_HERE'
+STOCK_API_KEY = "_YOUR_API_KEY_"
+NEWS_API_KEY = "_YOUR_API_KEY_"
+account_sid = "_YOUR_SID_"
+auth_token = '_YOUR_API_KEY_'
 string = ""
 
 
@@ -34,7 +34,7 @@ else:
 ## STEP 3: Use twilio.com/docs/sms/quickstart/python
 # Send a separate message with each article's title and description to your phone number. 
 #HINT 1: Consider using a List Comprehension.
-if diff_percent+5 > 5:
+if diff_percent > 5:
     news_data = (get(f"{NEWS_ENDPOINT}?q={COMPANY_NAME}&apiKey={NEWS_API_KEY}").json())['articles'][:3]
     client = Client(account_sid, auth_token)
     for i in range(len(news_data)):
@@ -43,8 +43,8 @@ if diff_percent+5 > 5:
            {STOCK}:  {string}
 Headline: {news_data[i]['title']} ({STOCK})?
 Brief: {news_data[i]['description']}""",
-            from_='whatsapp:+_YOUR_SANDBOX_PHONE_HERE_',
-            to='whatsapp:+_YOUR_PHONE_HERE_'
+            from_='whatsapp:+_YOUR_SANDBOX_PHONE_',
+            to='whatsapp:+_YOUR_PHONE_'
         )
         print(message.status)
 
